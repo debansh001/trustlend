@@ -1,5 +1,4 @@
 import { CheckCircle2 } from "lucide-react";
-import transparentBg from "@/assets/what is crypto-bg.png";
 import type { ReasonItem } from "@/types/landing";
 
 interface UspSectionProps {
@@ -10,7 +9,7 @@ export function UspSection({ items }: UspSectionProps) {
   return (
     <section
       className="section-anchor reasons-section"
-      style={{ backgroundImage: `url(${transparentBg.src})` }}
+      style={{ backgroundImage: `url('/assets/what is crypto-bg.png')` }}
     >
       <div className="crypto-container py-20">
         <h2 className="reasons-title font-display">Why TrustLend?</h2>
