@@ -1,5 +1,4 @@
 import type { StepItem } from "@/types/landing";
-import transparentBg from "@/assets/what is crypto-bg.png";
 
 interface ProcessSectionProps {
   steps: StepItem[];
@@ -10,7 +9,7 @@ export function ProcessSection({ steps }: ProcessSectionProps) {
     <section
       id="journey"
       className="section-anchor journey-section"
-      style={{ backgroundImage: `url(${transparentBg.src})` }}
+      style={{ backgroundImage: `url('/assets/what is crypto-bg.png')` }}
     >
       <div className="crypto-container grid items-start gap-10 py-20 lg:grid-cols-[1.1fr_0.9fr]">
         <div className="space-y-4">

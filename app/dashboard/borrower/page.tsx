@@ -1,6 +1,9 @@
 import { RoleDashboardScreen } from "@/components/dashboard/RoleDashboardScreen";
+import { requireAuthenticatedUser } from "@/lib/auth/session";
 
-export default function BorrowerDashboardPage() {
+export default async function BorrowerDashboardPage() {
+  await requireAuthenticatedUser("borrower");
+
   return (
     <RoleDashboardScreen
       expectedRole="borrower"
