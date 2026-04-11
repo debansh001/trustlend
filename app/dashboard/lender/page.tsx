@@ -257,16 +257,16 @@ export default async function LenderDashboardPage() {
               <p className="workspace-card-copy">Auto-reinvest: Enabled</p>
               <p className="workspace-card-copy">Notifications: Payment due, repayment received, monthly report</p>
               <div className="workspace-inline-actions">
-                <button type="button" className="workspace-nav-link">Save Preferences</button>
+                <button type="button" className="workspace-nav-link" suppressHydrationWarning>Save Preferences</button>
               </div>
             </div>
             <div>
               <p className="workspace-card-copy">Support: support@trustlend.com</p>
               <p className="workspace-card-copy">Live Chat: 9AM-6PM UTC</p>
               <div className="workspace-inline-actions">
-                <button type="button" className="workspace-nav-link">FAQ</button>
-                <button type="button" className="workspace-nav-link">Create Ticket</button>
-                <button type="button" className="workspace-nav-link">Export Data</button>
+                <button type="button" className="workspace-nav-link" suppressHydrationWarning>FAQ</button>
+                <button type="button" className="workspace-nav-link" suppressHydrationWarning>Create Ticket</button>
+                <button type="button" className="workspace-nav-link" suppressHydrationWarning>Export Data</button>
               </div>
             </div>
           </div>
