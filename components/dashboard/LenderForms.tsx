@@ -56,6 +56,7 @@ export function DepositForm({ pools, onSubmit }: DepositFormProps) {
           onChange={(e) => setPoolId(e.target.value)}
           className="workspace-input"
           disabled={loading}
+          suppressHydrationWarning
         >
           <option value="">Choose a pool...</option>
           {pools.map((pool) => (
@@ -80,6 +81,7 @@ export function DepositForm({ pools, onSubmit }: DepositFormProps) {
           placeholder="Enter amount"
           className="workspace-input"
           disabled={loading}
+          suppressHydrationWarning
         />
       </div>
 
@@ -90,6 +92,7 @@ export function DepositForm({ pools, onSubmit }: DepositFormProps) {
         disabled={loading || !amount || !poolId}
         className="workspace-button workspace-button--primary"
         style={{ width: "100%" }}
+        suppressHydrationWarning
       >
         {loading ? "Processing..." : "Deposit Now"}
       </button>
@@ -150,6 +153,7 @@ export function WithdrawForm({ positions, onSubmit }: WithdrawFormProps) {
           onChange={(e) => setPositionId(e.target.value)}
           className="workspace-input"
           disabled={loading || positions.length === 0}
+          suppressHydrationWarning
         >
           <option value="">Choose position...</option>
           {positions.map((pos) => (
@@ -177,6 +181,7 @@ export function WithdrawForm({ positions, onSubmit }: WithdrawFormProps) {
             className="workspace-input"
             disabled={loading}
             style={{ flex: 1 }}
+            suppressHydrationWarning
           />
           <button
             type="button"
@@ -184,6 +189,7 @@ export function WithdrawForm({ positions, onSubmit }: WithdrawFormProps) {
             disabled={loading || availableWithdraw <= 0}
             className="workspace-button workspace-button--secondary"
             style={{ minWidth: "80px" }}
+            suppressHydrationWarning
           >
             Max
           </button>
@@ -197,6 +203,7 @@ export function WithdrawForm({ positions, onSubmit }: WithdrawFormProps) {
         disabled={loading || !amount || !positionId}
         className="workspace-button workspace-button--primary"
         style={{ width: "100%" }}
+        suppressHydrationWarning
       >
         {loading ? "Processing..." : "Withdraw"}
       </button>
