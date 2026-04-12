@@ -7,8 +7,11 @@ export async function POST(request: NextRequest) {
     const { user } = await requireAuthenticatedUser("lender");
     const { poolId, amount } = await request.json();
 
-    if (!poolId || !amount || amount <= 0) {
+    if (!poolId || !amount || amount <= 0 || !Number.isFinite(amount)) {
       return NextResponse.json({ error: "Invalid request" }, { status: 400 });
+    }
+    if (amount > 1_000_000) {
+      return NextResponse.json({ error: "Amount exceeds maximum allowed" }, { status: 400 });
     }
 
     const supabase = await getServerSupabaseClient();
@@ -19,7 +22,7 @@ export async function POST(request: NextRequest) {
     // Verify pool exists and is active
     const { data: pool, error: poolError } = await supabase
       .from("lending_pools")
-      .select("*")
+      .select("id, status, total_liquidity, available_liquidity")
       .eq("id", poolId)
       .eq("status", "active")
       .single();

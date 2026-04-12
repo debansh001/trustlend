@@ -7,10 +7,7 @@ interface UspSectionProps {
 
 export function UspSection({ items }: UspSectionProps) {
   return (
-    <section
-      className="section-anchor reasons-section"
-      style={{ backgroundImage: `url('/assets/what is crypto-bg.png')` }}
-    >
+    <section className="section-anchor reasons-section">
       <div className="crypto-container py-20">
         <h2 className="reasons-title font-display">Why TrustLend?</h2>
 

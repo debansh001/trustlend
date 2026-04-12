@@ -6,11 +6,7 @@ interface ProcessSectionProps {
 
 export function ProcessSection({ steps }: ProcessSectionProps) {
   return (
-    <section
-      id="journey"
-      className="section-anchor journey-section"
-      style={{ backgroundImage: `url('/assets/what is crypto-bg.png')` }}
-    >
+    <section id="journey" className="section-anchor journey-section">
       <div className="crypto-container grid items-start gap-10 py-20 lg:grid-cols-[1.1fr_0.9fr]">
         <div className="space-y-4">
           {steps.map((step) => (
