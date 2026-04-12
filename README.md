@@ -51,19 +51,13 @@ TrustLend solves this by using behavior-based on-chain reputation and contract-e
 | TrustLend target lender yield | 10% to 15% | Better risk-adjusted upside |
 | Decision speed target | Minutes to hours | Faster than conventional underwriting |
 
-### 📉 Capital Gap Visualization
+### 📉 Capital Gap Distribution
 
 ```mermaid
-flowchart LR
-   A[Unbanked Borrowers Need Capital] --> B[Traditional Finance Friction]
-   B --> C[Low Access To Fair Credit]
-   D[Idle Global Capital] --> E[Low Yield Products]
-   E --> F[Underutilized Liquidity]
-   C --> G[TrustLend Bridge]
-   F --> G
-   G --> H[Behavior-Based Reputation]
-   G --> I[Transparent Smart Contracts]
-   G --> J[Cross-Border Micro-Lending]
+pie showData
+   title Global Credit Access Gap (Illustrative)
+   "Unbanked / Underserved" : 68
+   "Formally Served" : 32
 ```
 
 ## 🏆 What Is Unique In TrustLend
@@ -80,13 +74,12 @@ flowchart LR
 
 ![TrustLend Landing](assets/landing.png)
 
-### Landing Mobile View
+### Mobile Views
 
-![TrustLend Landing Mobile](assets/landing-mobile-view.png)
-
-### Auth Mobile View
-
-![TrustLend Auth Mobile](assets/auth-mobile.png)
+<p align="center">
+   <img src="assets/landing-mobile-view.png" alt="TrustLend Landing Mobile" width="45%" />
+   <img src="assets/auth-mobile.png" alt="TrustLend Auth Mobile" width="45%" />
+</p>
 
 ### Borrower Dashboard
 
@@ -184,35 +177,36 @@ flowchart LR
    subgraph Client[Client Layer]
       A1[Web App - Next.js]
       A2[Freighter Wallet]
+      A3[Dashboard UI]
    end
 
    subgraph Backend[Backend Layer]
+      B0[Server Actions / API Routes]
       B1[Supabase Auth]
       B2[Supabase Postgres]
       B3[Supabase Storage - KYC Docs]
-      B4[Server Actions / API Routes]
    end
 
    subgraph Chain[Blockchain Layer - Stellar Testnet]
+      C0[Contract Gateway]
       C1[Reputation Contract]
       C2[Escrow Contract]
       C3[Lending Contract]
       C4[Default Management Contract]
    end
 
-   A1 --> B4
+   A1 --> A3
+   A3 --> B0
    A1 --> A2
-   B4 --> B1
-   B4 --> B2
-   B4 --> B3
-   B4 --> C1
-   B4 --> C2
-   B4 --> C3
-   B4 --> C4
-   A2 --> C1
-   A2 --> C2
-   A2 --> C3
-   A2 --> C4
+   B0 --> B1
+   B0 --> B2
+   B0 --> B3
+   B0 --> C0
+   A2 --> C0
+   C0 --> C1
+   C0 --> C2
+   C0 --> C3
+   C0 --> C4
 ```
 
 ## ✨ Features (Tabular)
