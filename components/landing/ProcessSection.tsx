@@ -23,7 +23,7 @@ export function ProcessSection({ steps }: ProcessSectionProps) {
         <article className="journey-cta">
           <p className="journey-kicker">JOIN EASILY WITH JUST</p>
           <h2 className="font-display text-5xl text-[#7325c8]">5 Steps</h2>
-          <a href="#home" className="journey-button">
+          <a href="/auth" className="journey-button">
             Start now
           </a>
         </article>

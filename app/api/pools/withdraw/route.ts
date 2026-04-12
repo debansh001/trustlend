@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireAuthenticatedUser } from "@/lib/auth/session";
 import { getServerSupabaseClient } from "@/lib/supabase/server";
+import { isRedirectError } from "next/dist/client/components/redirect-error";
 
 export async function POST(request: NextRequest) {
   try {
@@ -102,6 +103,9 @@ export async function POST(request: NextRequest) {
       { status: 200 }
     );
   } catch (error) {
+    if (isRedirectError(error)) {
+      throw error;
+    }
     console.error("Withdrawal error:", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }

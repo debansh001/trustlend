@@ -23,7 +23,7 @@ export function AboutSection({ content, steps }: AboutSectionProps) {
         </div>
 
         <div className="mt-8 text-center">
-          <a href="#home" className="p2p-button">
+          <a href="/auth" className="p2p-button">
             Start trading
           </a>
         </div>

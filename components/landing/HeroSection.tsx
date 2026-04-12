@@ -11,32 +11,40 @@ export function HeroSection({ content, isAuthenticated = false }: HeroSectionPro
     <section id="home" className="hero-section section-anchor">
       <div className="crypto-container hero-grid">
         <article className="hero-copy">
-          <p className="hero-eyebrow">{content.eyebrow}</p>
+
+          {/* Eyebrow — styled badge */}
+          <div className="hero-eyebrow-badge">
+            <span className="hero-eyebrow-dot" />
+            {content.eyebrow}
+          </div>
+
+          {/* Title — each part forced to its own line */}
           <h1 className="hero-title font-display">
-            {content.titleMain}
-            <span>{content.titleAccent}</span>
+            <span className="hero-title-line">{content.titleMain}</span>
+            <span className="hero-title-line hero-title-accent">{content.titleAccent}</span>
           </h1>
+
           <p className="hero-description">{content.description}</p>
 
           <div className="hero-trust-pills" role="list" aria-label="TrustLend highlights">
-            <span className="hero-trust-pill" role="listitem">
-              Borrower flow
-            </span>
-            <span className="hero-trust-pill" role="listitem">
-              Lender flow
-            </span>
-            <span className="hero-trust-pill" role="listitem">
-              Real behavior scoring
-            </span>
+            <span className="hero-trust-pill" role="listitem">Borrower flow</span>
+            <span className="hero-trust-pill" role="listitem">Lender flow</span>
+            <span className="hero-trust-pill" role="listitem">Real behavior scoring</span>
           </div>
 
           <div className="hero-cta-wrap">
-            <a href={isAuthenticated ? "/dashboard" : "/auth"} className="google-btn google-btn-hero" id="hero-start-btn">
-              {isAuthenticated ? "Dashboard" : "Start now"}
+            <a
+              href={isAuthenticated ? "/dashboard" : "/auth"}
+              className="google-btn google-btn-hero"
+              id="hero-start-btn"
+            >
+              {isAuthenticated ? "Go to Dashboard →" : "Start now →"}
             </a>
           </div>
 
-          <p className="hero-subnote">Choose your role during sign-in. Dashboard is automatically split by role.</p>
+          <p className="hero-subnote">
+            Choose your role during sign-in. Dashboard is automatically split by role.
+          </p>
         </article>
 
         <article className="hero-visual" aria-hidden="true">

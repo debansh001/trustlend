@@ -7,6 +7,14 @@ import { getDashboardPath, normalizeUserRole } from "@/lib/auth/roles";
 const requestCounts = new Map<string, { count: number; resetAt: number }>();
 const WINDOW_MS = 60_000;   // 1-minute window
 const MAX_REQUESTS = 30;     // 30 API requests per IP per minute
+// SECURITY: bypass is disabled in production regardless of env var
+const DEV_BYPASS_ENABLED =
+  process.env.NODE_ENV !== "production" &&
+  process.env.ENABLE_DEV_AUTH_BYPASS === "true";
+
+function isValidUuid(value: string): boolean {
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value);
+}
 
 function getRateLimitKey(request: NextRequest): string {
   const forwarded = request.headers.get("x-forwarded-for");
@@ -14,6 +22,10 @@ function getRateLimitKey(request: NextRequest): string {
 }
 
 export async function proxy(request: NextRequest) {
+  const bypassUserId = request.headers.get("x-dev-user-id")?.trim() ?? "";
+  const bypassRoleRaw = request.headers.get("x-dev-role")?.trim();
+  const bypassActive = DEV_BYPASS_ENABLED && !!bypassUserId && isValidUuid(bypassUserId);
+
   // ── Rate limiting on API routes ──────────────────────────────────────────────
   if (request.nextUrl.pathname.startsWith("/api/")) {
     const key = getRateLimitKey(request);
@@ -68,20 +80,27 @@ export async function proxy(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
+  const effectiveUser = bypassActive
+    ? {
+        id: bypassUserId,
+        user_metadata: { account_type: normalizeUserRole(bypassRoleRaw) },
+      }
+    : user;
+
   const pathname = request.nextUrl.pathname;
   const isDashboardPath = pathname === "/dashboard" || pathname.startsWith("/dashboard/");
   const isAuthEntryPath = pathname === "/auth";
 
-  if (isDashboardPath && !user) {
+  if (isDashboardPath && !effectiveUser) {
     const redirectUrl = request.nextUrl.clone();
     redirectUrl.pathname = "/auth";
     redirectUrl.search = "";
     return NextResponse.redirect(redirectUrl);
   }
 
-  if (isAuthEntryPath && user) {
+  if (isAuthEntryPath && effectiveUser) {
     const redirectUrl = request.nextUrl.clone();
-    const role = normalizeUserRole(user.user_metadata?.account_type);
+    const role = normalizeUserRole(effectiveUser.user_metadata?.account_type);
     redirectUrl.pathname = getDashboardPath(role);
     redirectUrl.search = "";
     return NextResponse.redirect(redirectUrl);
