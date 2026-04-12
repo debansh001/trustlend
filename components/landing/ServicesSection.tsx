@@ -1,4 +1,4 @@
-import { MonitorPlay, TrendingUp } from "lucide-react";
+import { MonitorPlay, TrendingUp, ShieldCheck, Zap } from "lucide-react";
 import type { HighlightContent, MetricItem } from "@/types/landing";
 
 interface ServicesSectionProps {
@@ -27,6 +27,22 @@ export function ServicesSection({ metrics, content }: ServicesSectionProps) {
             <h2 className="showcase-title font-display">{content.title}</h2>
             <p className="showcase-description">{content.description}</p>
             <p className="showcase-callout">{content.callout}</p>
+
+            {/* Project summary blurb */}
+            <div className="showcase-project-blurb">
+              <div className="showcase-blurb-item">
+                <ShieldCheck size={16} className="showcase-blurb-icon" />
+                <span>4 Soroban smart contracts live on Stellar Testnet</span>
+              </div>
+              <div className="showcase-blurb-item">
+                <Zap size={16} className="showcase-blurb-icon" />
+                <span>On-chain reputation scoring — no collateral required</span>
+              </div>
+              <div className="showcase-blurb-item">
+                <TrendingUp size={16} className="showcase-blurb-icon" />
+                <span>Escrow-protected disbursement with 3-min revocation window</span>
+              </div>
+            </div>
           </article>
 
           <article className="dashboard-shell">
@@ -35,13 +51,28 @@ export function ServicesSection({ metrics, content }: ServicesSectionProps) {
               <div className="dashboard-card dashboard-card-strong">
                 <span className="dashboard-caption">Trust graph</span>
                 <TrendingUp size={18} />
+                <span className="dashboard-card-stat">+82 pts</span>
               </div>
-              <div className="dashboard-card">
+              <div className="dashboard-card dashboard-card-accent">
                 <span className="dashboard-caption">Risk monitor</span>
                 <MonitorPlay size={18} />
+                <span className="dashboard-card-stat">LOW</span>
               </div>
-              <div className="dashboard-chart" />
-              <div className="dashboard-mini" />
+              <div className="dashboard-chart">
+                <div className="dashboard-chart-bars">
+                  <span style={{ height: "40%" }} />
+                  <span style={{ height: "65%" }} />
+                  <span style={{ height: "50%" }} />
+                  <span style={{ height: "80%" }} />
+                  <span style={{ height: "60%" }} />
+                  <span style={{ height: "90%" }} />
+                </div>
+                <span className="dashboard-caption" style={{ marginTop: "0.5rem" }}>Loan volume</span>
+              </div>
+              <div className="dashboard-mini">
+                <span className="dashboard-caption">Insurance pool</span>
+                <span className="dashboard-mini-value">Funded</span>
+              </div>
             </div>
           </article>
         </div>

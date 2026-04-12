@@ -1,14 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireAuthenticatedUser } from "@/lib/auth/session";
 import { getServerSupabaseClient } from "@/lib/supabase/server";
+import { isRedirectError } from "next/dist/client/components/redirect-error";
 
 export async function POST(request: NextRequest) {
   try {
     const { user } = await requireAuthenticatedUser("lender");
     const { positionId, amount } = await request.json();
 
-    if (!positionId || !amount || amount <= 0) {
+    if (!positionId || !amount || amount <= 0 || !Number.isFinite(amount)) {
       return NextResponse.json({ error: "Invalid request" }, { status: 400 });
+    }
+    if (amount > 1_000_000) {
+      return NextResponse.json({ error: "Amount exceeds maximum allowed" }, { status: 400 });
     }
 
     const supabase = await getServerSupabaseClient();
@@ -19,7 +23,7 @@ export async function POST(request: NextRequest) {
     // Get position and verify ownership
     const { data: position, error: positionError } = await supabase
       .from("pool_positions")
-      .select("*")
+      .select("id, pool_id, principal_amount, withdrawn_amount")
       .eq("id", positionId)
       .eq("lender_id", user.id)
       .eq("status", "active")
@@ -39,7 +43,7 @@ export async function POST(request: NextRequest) {
     // Get pool
     const { data: pool, error: poolError } = await supabase
       .from("lending_pools")
-      .select("*")
+      .select("id, total_liquidity, available_liquidity")
       .eq("id", position.pool_id)
       .single();
 
@@ -99,6 +103,9 @@ export async function POST(request: NextRequest) {
       { status: 200 }
     );
   } catch (error) {
+    if (isRedirectError(error)) {
+      throw error;
+    }
     console.error("Withdrawal error:", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }

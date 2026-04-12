@@ -1,14 +1,19 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireAuthenticatedUser } from "@/lib/auth/session";
 import { getServerSupabaseClient } from "@/lib/supabase/server";
+import { isRedirectError } from "next/dist/client/components/redirect-error";
 
 export async function POST(request: NextRequest) {
   try {
     const { user } = await requireAuthenticatedUser("borrower");
     const { loanId, amount } = await request.json();
 
-    if (!loanId || !amount || amount <= 0) {
+    if (!loanId || !amount || amount <= 0 || !Number.isFinite(amount)) {
       return NextResponse.json({ error: "Invalid request" }, { status: 400 });
+    }
+    // Prevent unreasonably large amounts (max 1M XLM in stroops equivalent)
+    if (amount > 1_000_000) {
+      return NextResponse.json({ error: "Amount exceeds maximum allowed" }, { status: 400 });
     }
 
     const supabase = await getServerSupabaseClient();
@@ -19,7 +24,7 @@ export async function POST(request: NextRequest) {
     // Get loan and verify borrower
     const { data: loan, error: loanError } = await supabase
       .from("loans")
-      .select("*")
+      .select("id, borrower_id, status, repaid_amount, principal_amount, apr_bps")
       .eq("id", loanId)
       .eq("borrower_id", user.id)
       .single();
@@ -84,6 +89,9 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ repayment, loanStatus: newStatus }, { status: 201 });
   } catch (error) {
+    if (isRedirectError(error)) {
+      throw error;
+    }
     console.error("Repayment error:", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }

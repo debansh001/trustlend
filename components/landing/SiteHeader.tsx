@@ -1,3 +1,4 @@
+import Image from "next/image";
 import type { NavItem } from "@/types/landing";
 
 interface SiteHeaderProps {
@@ -10,7 +11,14 @@ export function SiteHeader({ items, isAuthenticated = false }: SiteHeaderProps) 
     <header className="site-header sticky top-0 z-30">
       <div className="crypto-container site-header-row">
         <a href="#home" className="site-logo-wrap" aria-label="TrustLend home">
-          <span className="site-logo-orb" aria-hidden="true" />
+          <Image
+            src="/logo.png"
+            alt="TrustLend Logo"
+            width={56}
+            height={56}
+            priority
+            style={{ width: "56px", height: "56px", borderRadius: "50%", objectFit: "cover" }}
+          />
           <span>
             <strong className="font-display site-logo-title">TrustLend</strong>
             <small className="site-logo-subtitle">Behavior-first credit network</small>

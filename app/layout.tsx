@@ -28,11 +28,17 @@ export const metadata: Metadata = {
     "crypto lending",
   ],
   authors: [{ name: "TrustLend" }],
+  icons: {
+    icon: "/logo.png",
+    shortcut: "/logo.png",
+    apple: "/logo.png",
+  },
   openGraph: {
     title: "TrustLend — Reputation-Based Micro-Lending",
     description:
       "Access credit based on real financial behavior. 1.7 billion unbanked adults deserve better.",
     type: "website",
+    images: [{ url: "/logo.png", width: 512, height: 512, alt: "TrustLend Logo" }],
   },
 };
 
@@ -42,7 +48,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="h-full">
+    <html lang="en" className="h-full" data-scroll-behavior="smooth">
       <body className={`${manrope.variable} ${sora.variable} flex min-h-full flex-col antialiased`}>
         {children}
       </body>

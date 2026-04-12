@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useCallback, useState } from "react";
 import { Loader2, ShieldCheck, AlertCircle, Rocket } from "lucide-react";
 import { ReputationContract } from "@/lib/contracts";
 
@@ -14,7 +14,7 @@ export function SorobanProfileCard({ walletAddress }: SorobanProfileCardProps) {
   const [error, setError] = useState<string | null>(null);
   const [txSuccess, setTxSuccess] = useState(false);
 
-  const checkProfile = async () => {
+  const checkProfile = useCallback(async () => {
     if (!walletAddress) return;
     try {
       const exists = await ReputationContract.hasProfile(walletAddress, walletAddress);
@@ -23,13 +23,13 @@ export function SorobanProfileCard({ walletAddress }: SorobanProfileCardProps) {
       console.error("[TrustLend] Failed to check on-chain profile:", err);
       // We don't set error here to avoid blocking UI with noise
     }
-  };
+  }, [walletAddress]);
 
   useEffect(() => {
     if (walletAddress) {
       checkProfile();
     }
-  }, [walletAddress]);
+  }, [walletAddress, checkProfile]);
 
   const handleInitialize = async () => {
     if (!walletAddress) return;
@@ -75,7 +75,7 @@ export function SorobanProfileCard({ walletAddress }: SorobanProfileCardProps) {
         <div style={{ flex: 1 }}>
           <h3 style={{ fontSize: "1rem", fontWeight: 600, marginBottom: "0.25rem" }}>Initialize On-Chain Profile</h3>
           <p style={{ fontSize: "0.85rem", opacity: 0.7, lineHeight: 1.5, marginBottom: "1rem" }}>
-            Your wallet is connected, but your reputation profile hasn't been created on Stellar yet. 
+            Your wallet is connected, but your reputation profile hasn&apos;t been created on Stellar yet. 
             This is required to apply for micro-loans.
           </p>
 

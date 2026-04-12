@@ -293,3 +293,6 @@ impl BorrowerReputationContract {
         }
     }
 }
+
+#[cfg(test)]
+mod test;
