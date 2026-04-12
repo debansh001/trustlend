@@ -3,6 +3,11 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { formatCurrency } from "@/lib/utils/formatting";
+import { 
+  LendingContract, 
+  ReputationContract, 
+  xlmToStroops,
+} from "@/lib/contracts";
 
 interface LoanApplicationFormProps {
   maxAmount: number;
@@ -211,9 +216,12 @@ export function BorrowerForms({
 }: BorrowerFormsProps) {
   const router = useRouter();
   const [monitoringDays] = useState(0);
+  const [sorobanLoading, setSorobanLoading] = useState(false);
 
   const handleLoanApplication = async (amount: number, duration: number) => {
+    setSorobanLoading(true);
     try {
+      // 1. Supabase application (Database record)
       const response = await fetch("/api/loans/apply", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -225,10 +233,45 @@ export function BorrowerForms({
         throw new Error(error.error || "Failed to apply for loan");
       }
 
+      const { loan } = await response.json();
+
+      // 2. Soroban application (On-chain record)
+      // Check if wallet is connected (this is a client component)
+      const walletAddress = window.localStorage.getItem("wallet_address") || "";
+      if (walletAddress) {
+        try {
+          console.log("[TrustLend] Initiating Soroban loan request...");
+          
+          // Fetch current reputation-based limits from contract
+          const [onChainRate, onChainMax] = await Promise.all([
+            ReputationContract.getInterestRate(walletAddress, walletAddress),
+            ReputationContract.getMaxLoan(walletAddress, walletAddress)
+          ]);
+
+          const amountStroops = xlmToStroops(amount);
+          
+          await LendingContract.createLoanRequest(
+            walletAddress,
+            amountStroops,
+            duration,
+            onChainRate,
+            onChainMax
+          );
+          
+          console.log("[TrustLend] Soroban loan request recorded.");
+        } catch (sorobanErr) {
+          console.error("[TrustLend] Soroban sync failed:", sorobanErr);
+          // We don't block the UI if Soroban fails, but we log it.
+          // In a real app, we'd show a "Retry Sync" button.
+        }
+      }
+
       router.refresh();
       alert("Loan application submitted successfully!");
     } catch (error) {
       throw error;
+    } finally {
+      setSorobanLoading(false);
     }
   };
 

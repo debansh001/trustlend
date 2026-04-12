@@ -1858,6 +1858,19 @@ a {
   flex-wrap: wrap;
 }
 
+.hero-cta-wrap {
+  margin-top: 0.75rem;
+  display: inline-flex;
+  align-items: center;
+}
+
+.hero-subnote {
+  margin: 0.65rem 0 0;
+  color: #2f3a66;
+  font-size: 0.72rem;
+  line-height: 1.45;
+}
+
 .hero-trust-pill {
   color: #6370a0;
   font-size: 0.74rem;

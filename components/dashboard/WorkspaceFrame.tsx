@@ -30,6 +30,7 @@ interface WorkspaceFrameProps {
   profilePath?: string;
   profileSummary?: ProfileSummary;
   headerWidget?: React.ReactNode;
+  showProfileAlert?: boolean;
   children?: React.ReactNode;
 }
 
@@ -44,6 +45,7 @@ export function WorkspaceFrame({
   profilePath,
   profileSummary,
   headerWidget,
+  showProfileAlert = true,
   children,
 }: WorkspaceFrameProps) {
   const resolvedPath = currentPath ?? links[0]?.href ?? "/dashboard";
@@ -98,33 +100,35 @@ export function WorkspaceFrame({
               ))}
             </nav>
 
-            <section className="premium-alert" aria-live="polite">
-              <p className="premium-alert-badge">Action Required</p>
-              <div className="premium-alert-header">
-                <span className="premium-alert-icon" aria-hidden="true">
-                  <span>!</span>
-                </span>
-                <p className="premium-alert-title">Profile & KYC</p>
-              </div>
-              <p className="workspace-profile-warning">High warning: complete profile to receive or grant loans.</p>
-              <p className="workspace-profile-copy">{resolvedProfileSummary.warningText}</p>
-              
-              <div className="workspace-progress" style={{ margin: "0.8rem 0" }} role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={resolvedProfileSummary.completion}>
-                <span style={{ width: `${resolvedProfileSummary.completion}%` }} />
-              </div>
-              
-              {resolvedProfileSummary.requiredItems.length > 0 && (
-                <ul className="workspace-checklist">
-                  {resolvedProfileSummary.requiredItems.map((item) => (
-                    <li key={item}>{item}</li>
-                  ))}
-                </ul>
-              )}
-              
-              <Link href={resolvedProfilePath} className="premium-alert-btn">
-                Complete Profile Now
-              </Link>
-            </section>
+            {showProfileAlert ? (
+              <section className="premium-alert" aria-live="polite">
+                <p className="premium-alert-badge">Action Required</p>
+                <div className="premium-alert-header">
+                  <span className="premium-alert-icon" aria-hidden="true">
+                    <span>!</span>
+                  </span>
+                  <p className="premium-alert-title">Profile & KYC</p>
+                </div>
+                <p className="workspace-profile-warning">High warning: complete profile to receive or grant loans.</p>
+                <p className="workspace-profile-copy">{resolvedProfileSummary.warningText}</p>
+
+                <div className="workspace-progress" style={{ margin: "0.8rem 0" }} role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={resolvedProfileSummary.completion}>
+                  <span style={{ width: `${resolvedProfileSummary.completion}%` }} />
+                </div>
+
+                {resolvedProfileSummary.requiredItems.length > 0 && (
+                  <ul className="workspace-checklist">
+                    {resolvedProfileSummary.requiredItems.map((item) => (
+                      <li key={item}>{item}</li>
+                    ))}
+                  </ul>
+                )}
+
+                <Link href={resolvedProfilePath} className="premium-alert-btn">
+                  Complete Profile Now
+                </Link>
+              </section>
+            ) : null}
           </aside>
 
           <div className="workspace-main-panel">

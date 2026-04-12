@@ -10,7 +10,9 @@ import {
   presentBorrowerMetrics,
 } from "@/lib/dashboard/metrics";
 import { getServerSupabaseClient } from "@/lib/supabase/server";
+import { SorobanProfileCard } from "@/components/dashboard/SorobanProfileCard";
 import { formatCurrency } from "@/lib/utils/formatting";
+import { STELLAR_VERIFY_PORTAL } from "@/lib/stellar/explorer";
 
 function daysSince(value: string | null | undefined) {
   if (!value) return 0;
@@ -21,6 +23,7 @@ function daysSince(value: string | null | undefined) {
 
 export default async function BorrowerDashboardPage() {
   const { user } = await requireAuthenticatedUser("borrower");
+  const walletAddress = String(user.user_metadata?.wallet_address ?? "") || null;
   const metrics = await getBorrowerDashboardMetrics(user.id);
 
   const supabase = await getServerSupabaseClient();
@@ -108,7 +111,7 @@ export default async function BorrowerDashboardPage() {
       metrics={presentBorrowerMetrics(metrics)}
       headerWidget={(
         <WalletCard
-          address={String(user.user_metadata?.wallet_address ?? "") || null}
+          address={walletAddress}
           available={0}
           inLoansOrPools={inLoansXlm}
           pending={pendingXlm}
@@ -136,6 +139,13 @@ export default async function BorrowerDashboardPage() {
       ]}
     >
       <div className="workspace-stack">
+        {!walletAddress ? (
+          <article className="workspace-card workspace-card--full">
+            <h2 className="workspace-card-title">Wallet connection required</h2>
+            <p className="workspace-card-copy">Connect wallet first to unlock borrowing and repayment workflows.</p>
+          </article>
+        ) : (
+          <>
         <section className="workspace-grid workspace-grid--three">
           <FinanceChart
             title="Borrowing Trend"
@@ -207,6 +217,8 @@ export default async function BorrowerDashboardPage() {
             </div>
           </article>
         </section>
+        
+        <SorobanProfileCard walletAddress={walletAddress} />
 
         <article className="workspace-card workspace-card--full">
           <h2 className="workspace-card-title">Your Active Loans</h2>
@@ -284,12 +296,15 @@ export default async function BorrowerDashboardPage() {
         <article className="workspace-card workspace-card--full">
           <h2 className="workspace-card-title">Help & Support</h2>
           <p className="workspace-card-copy" style={{ fontSize: "0.9rem", marginTop: "0.5rem" }}>Email: support@trustlend.com | Live chat: 9AM-6PM UTC</p>
+          <p className="workspace-card-copy" style={{ fontSize: "0.9rem" }}>Blockchain verification portal: {STELLAR_VERIFY_PORTAL}</p>
           <div className="workspace-inline-actions" style={{ marginTop: "1rem" }}>
             <button className="workspace-nav-link">FAQ</button>
             <button className="workspace-nav-link">Create Support Ticket</button>
             <button className="workspace-nav-link">Video Tutorials</button>
           </div>
         </article>
+          </>
+        )}
       </div>
     </WorkspaceFrame>
   );

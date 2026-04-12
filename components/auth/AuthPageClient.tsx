@@ -14,6 +14,8 @@ import {
   type UserRole,
 } from "@/lib/auth/roles";
 
+type AuthSelectableRole = "borrower" | "lender";
+
 type AuthStep =
   | "sign-up"
   | "sign-in"
@@ -49,9 +51,9 @@ export function AuthPageClient() {
   const router = useRouter();
 
   const paramRole = params.get("role");
-  const initialRole: UserRole = isUserRole(paramRole) ? paramRole : "borrower";
+  const initialRole: AuthSelectableRole | null = (paramRole === "borrower" || paramRole === "lender") ? paramRole : null;
 
-  const [role, setRole] = useState<UserRole>(initialRole);
+  const [role, setRole] = useState<AuthSelectableRole | null>(initialRole);
   const [authStep, setAuthStep] = useState<AuthStep>("sign-in");
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
@@ -62,11 +64,15 @@ export function AuthPageClient() {
   const [googleLoading, setGoogleLoading] = useState(false);
   const [message, setMessage] = useState<{ type: "error" | "info" | "success"; text: string } | null>(null);
 
-  const meta = ROLE_META[role];
+  const meta = role ? ROLE_META[role] : null;
 
   const persistRole = () => {
     if (typeof window !== "undefined") {
-      window.localStorage.setItem(PENDING_ROLE_KEY, role);
+      if (role) {
+        window.localStorage.setItem(PENDING_ROLE_KEY, role);
+      } else {
+        window.localStorage.removeItem(PENDING_ROLE_KEY);
+      }
     }
   };
 
@@ -93,6 +99,11 @@ export function AuthPageClient() {
   };
 
   const handleGoogleSignIn = async () => {
+    if (authStep === "sign-up" && !role) {
+      setMessage({ type: "error", text: "Please select Borrower or Lender before continuing." });
+      return;
+    }
+
     setGoogleLoading(true);
     setMessage(null);
 
@@ -134,6 +145,10 @@ export function AuthPageClient() {
   const handleSignUp = async () => {
     if (!email || !password || !fullName.trim()) {
       setMessage({ type: "error", text: "Name, email, and password are required." });
+      return;
+    }
+    if (!role) {
+      setMessage({ type: "error", text: "Please select Borrower or Lender before creating your account." });
       return;
     }
     if (password.length < 8) {
@@ -333,6 +348,11 @@ export function AuthPageClient() {
     }
 
     if (type === "signup") {
+      if (!role) {
+        setMessage({ type: "error", text: "Please select a role and request a new signup code." });
+        return;
+      }
+
       const { data: updatedData, error: updateError } = await supabase.auth.updateUser({
         password,
         data: {
@@ -422,12 +442,12 @@ export function AuthPageClient() {
       return (
         <div className="auth-page-left-body">
           <div className="auth-page-role-badge" style={{ background: role === "lender" ? "rgba(34,207,157,0.12)" : "rgba(127,47,209,0.12)", borderColor: role === "lender" ? "rgba(34,207,157,0.35)" : "rgba(127,47,209,0.35)" }}>
-            <span className="auth-page-role-emoji">{meta.emoji}</span>
+            <span className="auth-page-role-emoji">{meta?.emoji ?? "👤"}</span>
             <span className="auth-page-role-badge-label" style={{ color: role === "lender" ? "#17a87a" : "#6e2fc1" }}>
-              Joining as {meta.label}
+              {meta ? `Joining as ${meta.label}` : "Choose your account type"}
             </span>
           </div>
-          <p className="auth-page-left-tagline">{meta.tagline}</p>
+          <p className="auth-page-left-tagline">{meta?.tagline ?? "Pick Borrower or Lender to tailor your dashboard and onboarding."}</p>
           <ul className="auth-page-trust-list" aria-label="Platform highlights">
             <li><span className="auth-page-trust-dot" />Behavior-based reputation score</li>
             <li><span className="auth-page-trust-dot" />No collateral required</li>
@@ -504,35 +524,14 @@ export function AuthPageClient() {
                 </button>
               </div>
 
-              {/* Role picker (only during sign up) */}
-              {authStep === "sign-up" && (
-                <div className="auth-page-role-picker" role="group" aria-label="Choose your role">
-                  <p className="auth-page-section-label">I am a</p>
-                  <div className="auth-page-role-tabs">
-                    {(["borrower", "lender"] as UserRole[]).map((r) => (
-                      <button
-                        key={r}
-                        type="button"
-                        id={`role-tab-${r}`}
-                        className={`auth-page-role-tab${role === r ? " auth-page-role-tab--active" : ""}`}
-                        onClick={() => { setRole(r); setMessage(null); }}
-                        aria-pressed={role === r}
-                      >
-                        <span className="auth-page-role-tab-emoji">{ROLE_META[r].emoji}</span>
-                        {ROLE_META[r].label}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
             </>
           )}
 
           {/* Titles */}
           {authStep === "sign-up" && (
             <>
-              <h1 className="auth-page-title font-display">Join as {meta.label}</h1>
-              <p className="auth-page-subtitle">Create your account and start building trust.</p>
+              <h1 className="auth-page-title font-display">{meta ? `Join as ${meta.label}` : "Create your account"}</h1>
+              <p className="auth-page-subtitle">Set your password, then choose Borrower or Lender to continue.</p>
             </>
           )}
           {authStep === "sign-in" && (
@@ -697,6 +696,27 @@ export function AuthPageClient() {
                   >
                     {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                   </button>
+                </div>
+              </div>
+            )}
+
+            {authStep === "sign-up" && (
+              <div className="auth-page-role-picker" role="group" aria-label="Choose your role">
+                <p className="auth-page-section-label">I am a</p>
+                <div className="auth-page-role-tabs">
+                  {(["borrower", "lender"] as AuthSelectableRole[]).map((r) => (
+                    <button
+                      key={r}
+                      type="button"
+                      id={`role-tab-${r}`}
+                      className={`auth-page-role-tab${role === r ? " auth-page-role-tab--active" : ""}`}
+                      onClick={() => { setRole(r); setMessage(null); }}
+                      aria-pressed={role === r}
+                    >
+                      <span className="auth-page-role-tab-emoji">{ROLE_META[r].emoji}</span>
+                      {ROLE_META[r].label}
+                    </button>
+                  ))}
                 </div>
               </div>
             )}
