@@ -1,12 +1,12 @@
 import Image from "next/image";
 import type { HeroContent } from "@/types/landing";
-import { AuthAccessButton } from "@/components/auth/AuthAccessButton";
 
 interface HeroSectionProps {
   content: HeroContent;
+  isAuthenticated?: boolean;
 }
 
-export function HeroSection({ content }: HeroSectionProps) {
+export function HeroSection({ content, isAuthenticated = false }: HeroSectionProps) {
   return (
     <section id="home" className="hero-section section-anchor">
       <div className="crypto-container hero-grid">
@@ -31,7 +31,9 @@ export function HeroSection({ content }: HeroSectionProps) {
           </div>
 
           <div className="hero-cta-wrap">
-            <AuthAccessButton className="google-btn google-btn-hero" buttonLabel="Start now" />
+            <a href={isAuthenticated ? "/dashboard" : "/auth"} className="google-btn google-btn-hero" id="hero-start-btn">
+              {isAuthenticated ? "Dashboard" : "Start now"}
+            </a>
           </div>
 
           <p className="hero-subnote">Choose your role during sign-in. Dashboard is automatically split by role.</p>

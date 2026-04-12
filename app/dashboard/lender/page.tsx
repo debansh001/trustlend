@@ -9,9 +9,11 @@ import {
 } from "@/lib/dashboard/metrics";
 import { getServerSupabaseClient } from "@/lib/supabase/server";
 import { formatCurrency } from "@/lib/utils/formatting";
+import { buildStellarTxVerificationUrl, isLikelyTxHash, STELLAR_VERIFY_PORTAL } from "@/lib/stellar/explorer";
 
 export default async function LenderDashboardPage() {
   const { user } = await requireAuthenticatedUser("lender");
+  const walletAddress = String(user.user_metadata?.wallet_address ?? "") || null;
   const metrics = await getLenderDashboardMetrics(user.id);
 
   const supabase = await getServerSupabaseClient();
@@ -36,7 +38,7 @@ export default async function LenderDashboardPage() {
           .limit(20),
         supabase
           .from("loan_repayments")
-          .select("id, loan_id, amount, paid_at")
+          .select("id, loan_id, amount, paid_at, tx_ref")
           .order("paid_at", { ascending: false })
           .limit(10),
         supabase
@@ -108,7 +110,7 @@ export default async function LenderDashboardPage() {
       metrics={presentLenderMetrics(metrics)}
       headerWidget={(
         <WalletCard
-          address={String(user.user_metadata?.wallet_address ?? "") || null}
+          address={walletAddress}
           available={0}
           inLoansOrPools={metrics.deployedCapital}
           pending={0}
@@ -140,6 +142,13 @@ export default async function LenderDashboardPage() {
       ]}
     >
       <div className="workspace-stack">
+        {!walletAddress ? (
+          <article className="workspace-card workspace-card--full">
+            <h2 className="workspace-card-title">Wallet connection required</h2>
+            <p className="workspace-card-copy">Connect wallet first to unlock lending operations and portfolio data.</p>
+          </article>
+        ) : (
+          <>
         <section className="workspace-grid workspace-grid--three">
           <FinanceChart
             title="Cashflow Analytics"
@@ -242,10 +251,22 @@ export default async function LenderDashboardPage() {
                 repayments.slice(0, 6).map((item) => (
                   <li key={String(item.id)}>
                     Repayment {formatCurrency(Number(item.amount ?? 0))} on {item.paid_at ? new Date(String(item.paid_at)).toLocaleDateString() : "-"}
+                    {isLikelyTxHash(String(item.tx_ref ?? "")) ? (
+                      <a
+                        href={buildStellarTxVerificationUrl(String(item.tx_ref))}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="workspace-nav-link"
+                        style={{ marginLeft: "0.5rem" }}
+                      >
+                        Verify tx
+                      </a>
+                    ) : null}
                   </li>
                 ))
               )}
             </ul>
+            <p className="workspace-card-copy">Verification portal: {STELLAR_VERIFY_PORTAL}</p>
           </article>
         </section>
 
@@ -271,6 +292,8 @@ export default async function LenderDashboardPage() {
             </div>
           </div>
         </section>
+          </>
+        )}
       </div>
     </WorkspaceFrame>
   );

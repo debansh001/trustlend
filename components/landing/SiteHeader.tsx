@@ -2,9 +2,10 @@ import type { NavItem } from "@/types/landing";
 
 interface SiteHeaderProps {
   items: NavItem[];
+  isAuthenticated?: boolean;
 }
 
-export function SiteHeader({ items }: SiteHeaderProps) {
+export function SiteHeader({ items, isAuthenticated = false }: SiteHeaderProps) {
   return (
     <header className="site-header sticky top-0 z-30">
       <div className="crypto-container site-header-row">
@@ -28,9 +29,15 @@ export function SiteHeader({ items }: SiteHeaderProps) {
           <a href="#faq" className="site-nav-utility">
             Need help?
           </a>
-          <a href="/auth" className="google-btn google-btn-header" id="header-signin-btn">
-            Sign in
-          </a>
+          {isAuthenticated ? (
+            <a href="/dashboard" className="google-btn google-btn-header" id="header-dashboard-btn">
+              Dashboard
+            </a>
+          ) : (
+            <a href="/auth" className="google-btn google-btn-header" id="header-signin-btn">
+              Sign in
+            </a>
+          )}
         </div>
       </div>
 
