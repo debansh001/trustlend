@@ -17,7 +17,9 @@
 
 <p align="center">✨ Fast. Transparent. Auditable. Global. ✨</p>
 
-<p align="center"><strong>Live Production:</strong> <a href="https://trustlend-tau.vercel.app/">TrustLend Website</a></p>
+<p align="center"><strong>Live Production:</strong> <a href="https://trustlendborrow.vercel.app/">TrustLend Website</a></p>
+
+<p align="center"><strong>Youtube Video:</strong> <a href="https://youtu.be/V-SQxunQLow">TrustLend Demo</a></p>
 
 ## 🌍 About The Project
 
